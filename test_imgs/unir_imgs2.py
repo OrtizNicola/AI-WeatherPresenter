@@ -2,7 +2,7 @@ from PIL import Image, ImageDraw
 
 # Ruta de tu imagen
 mapa = 'mapa.png'
-lluvia = 'lluvia.png'
+lluvia = '../PrecipitacionAcumulada_fondo.png'
 
 # Cargar la imagen
 mapa = Image.open(mapa)
@@ -10,9 +10,18 @@ lluvia = Image.open(lluvia)
 
 ancho_lluvia, alto_lluvia = lluvia.size
 
-coordenadas_recorte = (20, 48, ancho_lluvia - 10, alto_lluvia - 122)  
+coordenadas_recorte = (20, 48, ancho_lluvia - 105, alto_lluvia - 105)  
+
+barra = lluvia.crop((20, alto_lluvia - 90, ancho_lluvia - 105, alto_lluvia))
 
 lluvia = lluvia.crop(coordenadas_recorte)
+
+
+nueva_lluvia = Image.new('RGB', (lluvia.size[0], lluvia.size[1] + barra.size[1]))
+nueva_lluvia.paste(barra, (0, 0))
+nueva_lluvia.paste(lluvia, (0, barra.size[1]))
+
+lluvia = nueva_lluvia
 
 ancho_lluvia, alto_lluvia = lluvia.size
 
@@ -35,23 +44,23 @@ nueva_imagen.paste(lluvia, (ancho_deseado, 0))
 dibujante = ImageDraw.Draw(nueva_imagen)
 
 # Definir las coordenadas para la línea (x0, y0, x1, y1)
-coordenadas_linea1 = (ancho_deseado, 5, 610 + 2, 150 + 2)
-coordenadas_linea2 = (ancho_deseado, largo_deseado - 5, 610 + 2, 235 - 2)
+coordenadas_linea1 = (ancho_deseado, 1, 570 + 2, 220 + 2)
+coordenadas_linea2 = (ancho_deseado, largo_deseado - 1, 570 + 2, 285 - 2)
 
-color_borde = (255, 0, 0)  # Por ejemplo, rojo en este caso
 
 # Coordenadas de los vértices del rectángulo
-vertices = [(610, 150), (710, 150), (710, 235), (610, 235), (610, 160)]
+vertices = [(570, 220), (610, 220), (610, 285), (570, 285), (570, 220)]
 
 # Dibujar el borde del rectángulo utilizando las coordenadas de los vértices
-dibujante.polygon(vertices, outline='black', width=5)
+dibujante.polygon(vertices, outline='#2E66EF', width=5)
 
 
 # Dibujar una línea en la imagen
-dibujante.line(coordenadas_linea1, fill='black', width=5) 
-dibujante.line(coordenadas_linea2, fill='black', width=5) 
+dibujante.line(coordenadas_linea1, fill='#2E66EF', width=5) 
+dibujante.line(coordenadas_linea2, fill='#2E66EF', width=5) 
 
 
 # Guardar la imagen resultante
 #       lluvia.save('imagen_resultante.png')
 nueva_imagen.show()
+nueva_imagen.save("pruebaaaa.png")
