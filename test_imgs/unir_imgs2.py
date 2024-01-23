@@ -1,66 +1,78 @@
 from PIL import Image, ImageDraw
 
-# Ruta de tu imagen
-mapa = 'mapa.png'
-lluvia = '../PrecipitacionAcumulada_fondo.png'
+# Paths de las imágenes
+mapa = "mapa.png"
+ecuador = "../PrecipitacionAcumulada_fondo.png"
+encabezado = "../ImagenFondo.jpg"
 
-# Cargar la imagen
+# Cargamos imágenes 
 mapa = Image.open(mapa)
-lluvia = Image.open(lluvia)
+ancho_mapa, alto_mapa = mapa.size
 
+ecuador = Image.open(ecuador)
+ancho_ecuador, alto_ecuador = ecuador.size
+
+encabezado = Image.open(encabezado)
+ancho_encabezado, alto_encabezado = encabezado.size
+
+# Recortamos el encabezado
+encabezado = encabezado.crop((0, 250, ancho_encabezado, 700))
+ancho_encabezado, alto_encabezado = encabezado.size
+
+# Recortamos la barra de los colores
+barra = ecuador.crop((20, alto_ecuador - 90, 
+                      ancho_ecuador - 105, alto_ecuador))
+ancho_barra, alto_barra = barra.size
+
+# Recortamos la gráfica del ecuador
+lluvia = ecuador.crop((20, 48, 
+                       ancho_ecuador - 105, alto_ecuador - 110))
 ancho_lluvia, alto_lluvia = lluvia.size
 
-coordenadas_recorte = (20, 48, ancho_lluvia - 105, alto_lluvia - 105)  
+# Hacemos el mapa de quito del mismo largo que el otro mapa
+ancho_deseado = int((ancho_mapa / alto_mapa) * alto_lluvia)
+mapa = mapa.resize((ancho_deseado, alto_lluvia))
+ancho_mapa, alto_mapa = mapa.size
 
-barra = lluvia.crop((20, alto_lluvia - 90, ancho_lluvia - 105, alto_lluvia))
+# Creamos nuevo canvas y pegamos las imágenes recortadas
+nuevo_canvas = Image.new('RGB', 
+                         (ancho_lluvia + ancho_mapa, 
+                          alto_lluvia + alto_barra),
+                         color = "#EBFBFB")
+ancho_canvas, alto_canvas = nuevo_canvas.size
+nuevo_canvas.paste(barra, (0, alto_mapa))
+nuevo_canvas.paste(lluvia, (ancho_mapa, 0))
+nuevo_canvas.paste(mapa, (0, 0))
 
-lluvia = lluvia.crop(coordenadas_recorte)
+# Definimos un dibujante para señalar a Quito en el mapa
+dibujante = ImageDraw.Draw(nuevo_canvas)
 
-
-nueva_lluvia = Image.new('RGB', (lluvia.size[0], lluvia.size[1] + barra.size[1]))
-nueva_lluvia.paste(barra, (0, 0))
-nueva_lluvia.paste(lluvia, (0, barra.size[1]))
-
-lluvia = nueva_lluvia
-
-ancho_lluvia, alto_lluvia = lluvia.size
-
-
-largo_deseado = alto_lluvia  # Reemplaza con el largo deseado
-
-# Calcular el ancho correspondiente manteniendo la proporción de la imagen original
-ancho_original, alto_original = mapa.size
-ancho_deseado = int((ancho_original / alto_original) * largo_deseado)
-
-# Redimensionar la imagen manteniendo la proporción de aspecto
-mapa = mapa.resize((ancho_deseado, largo_deseado))
-
-nueva_imagen = Image.new('RGB', (ancho_deseado + ancho_lluvia, largo_deseado))
-
-# Pegar las imágenes una al lado de la otra
-nueva_imagen.paste(mapa, (0, 0))
-nueva_imagen.paste(lluvia, (ancho_deseado, 0))
-
-dibujante = ImageDraw.Draw(nueva_imagen)
-
-# Definir las coordenadas para la línea (x0, y0, x1, y1)
-coordenadas_linea1 = (ancho_deseado, 1, 570 + 2, 220 + 2)
-coordenadas_linea2 = (ancho_deseado, largo_deseado - 1, 570 + 2, 285 - 2)
-
+# Definimos las coordenadas para las líneas (x0, y0, x1, y1)
+coordenadas_linea1 = (ancho_deseado, 1, 
+                      530 + 2, 140 + 2)
+coordenadas_linea2 = (ancho_deseado, alto_lluvia - 1, 
+                      530 + 2, 190 - 2)
 
 # Coordenadas de los vértices del rectángulo
-vertices = [(570, 220), (610, 220), (610, 285), (570, 285), (570, 220)]
+vertices = [(530, 140), (560, 140), (560, 190), (530, 190)]
 
-# Dibujar el borde del rectángulo utilizando las coordenadas de los vértices
-dibujante.polygon(vertices, outline='#2E66EF', width=5)
+# Dibujar rectángulo y las líneas con las coordenadas
+dibujante.polygon(vertices, outline='#2E66EF', width=3)
+dibujante.line(coordenadas_linea1, fill='#2E66EF', width=4) 
+dibujante.line(coordenadas_linea2, fill='#2E66EF', width=3) 
 
+# Modificar el encabezado para que cuadre con la imagen
+alto_deseado = int((alto_encabezado / ancho_encabezado) 
+                   * ancho_canvas)
+encabezado = encabezado.resize((ancho_canvas, alto_deseado))
+ancho_encabezado, alto_encabezado = encabezado.size
 
-# Dibujar una línea en la imagen
-dibujante.line(coordenadas_linea1, fill='#2E66EF', width=5) 
-dibujante.line(coordenadas_linea2, fill='#2E66EF', width=5) 
-
+# Aumentar el encabezado a la imagen de los mapas
+resultado = Image.new('RGB', 
+                      (ancho_canvas, 
+                      alto_canvas + alto_encabezado))
+resultado.paste(encabezado, (0, 0))
+resultado.paste(nuevo_canvas, (0, alto_encabezado))
 
 # Guardar la imagen resultante
-#       lluvia.save('imagen_resultante.png')
-nueva_imagen.show()
-nueva_imagen.save("pruebaaaa.png")
+resultado.save('fondo_presentador.jpg')
