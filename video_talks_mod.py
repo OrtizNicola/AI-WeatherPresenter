@@ -85,7 +85,10 @@ def generarfondo(Tabla_probs_csv, Tabla_probs_imagen, Imagen_ecuador):
 
     pichincha.plot(ax=ax, alpha=0.3, edgecolor='k', color='grey')
 
-    ctx.add_basemap(ax, crs=pichincha.crs.to_string(), source=ctx.providers.OpenStreetMap.Mapnik, alpha=0.8)
+    ctx.add_basemap(ax, 
+                    crs=pichincha.crs.to_string(), 
+                    source=ctx.providers.OpenStreetMap.Mapnik, 
+                    alpha=0.8)
 
     probs = mapear_probs(Tabla_probs_csv) 
 
@@ -95,7 +98,12 @@ def generarfondo(Tabla_probs_csv, Tabla_probs_imagen, Imagen_ecuador):
         marcador = marcadores[probs[station]] 
         imagen_marcador = plt.imread(marcador)
         img = OffsetImage(imagen_marcador, zoom=0.18)  
-        ab = AnnotationBbox(img, (latlon[1], latlon[0]), xycoords='data', frameon=False, xybox=(0, 9), boxcoords="offset points") 
+        ab = AnnotationBbox(img, 
+                            (latlon[1], latlon[0]), 
+                            xycoords='data', 
+                            frameon=False, 
+                            xybox=(0, 9), 
+                            boxcoords="offset points") 
         ax.add_artist(ab)
         ax.annotate(
             station + f" {probs[station]}%",
@@ -104,7 +112,8 @@ def generarfondo(Tabla_probs_csv, Tabla_probs_imagen, Imagen_ecuador):
             textcoords='offset points',
             fontsize=10,
             ha='center',
-            bbox=dict(boxstyle='round,pad=0.5', fc='white', alpha=0.8),
+            bbox=dict(boxstyle='round,pad=0.5', 
+                      fc='white', alpha=0.8),
             arrowprops=dict(arrowstyle='->', color='black')
         )
 
@@ -115,7 +124,8 @@ def generarfondo(Tabla_probs_csv, Tabla_probs_imagen, Imagen_ecuador):
     plt.xticks([])
     plt.yticks([])
 
-    plt.savefig('mapa.png', bbox_inches='tight', pad_inches=0, facecolor='#EBFAFA')
+    plt.savefig('mapa.png', bbox_inches='tight', 
+                pad_inches=0, facecolor='#EBFAFA')
 
     mapa = Image.open("mapa.png")
     mapa = mapa.crop((5, 5, mapa.size[0], mapa.size[1] - 5))
@@ -330,13 +340,17 @@ def generar_video(url_imagen, texto, header, voz):
         }
     }
 
-    response_post = requests.post(url, json = info_video, headers = header).json()
+    response_post = requests.post(url, 
+                                  json = info_video, 
+                                  headers = header).json()
     print(response_post)
-    response_get = requests.get(url + f'/{response_post["id"]}', headers = header).json()
+    response_get = requests.get(url + f'/{response_post["id"]}', 
+                                headers = header).json()
 
     while 'result_url' not in response_get:
         time.sleep(10)
-        response_get = requests.get(url + f'/{response_post["id"]}', headers = header).json()
+        response_get = requests.get(url + f'/{response_post["id"]}', 
+                                    headers = header).json()
 
     video_url = response_get['result_url']
     save_directory = os.getcwd()
