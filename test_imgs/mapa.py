@@ -1,23 +1,8 @@
 import geopandas as gpd
 import matplotlib.pyplot as plt
-import contextily as ctx
+import contextily as ctx 
 from PIL import Image
 import csv
-
-pichincha = gpd.read_file('./Quito/quito_urbano.shp')
-
-marcadores = {
-    10: "./iconos_clima/soleado.png",
-    20: "./iconos_clima/parcialm_nublado.png",
-    30: "./iconos_clima/parcialm_nublado2.png",
-    40: "./iconos_clima/nublado.png",
-    50: "./iconos_clima/nublado.png",
-    60: "./iconos_clima/chubascos.png",
-    70: "./iconos_clima/lluvia.png",
-    80: "./iconos_clima/lluvia.png",
-    90: "./iconos_clima/lluvia_tormenta_electrica.png",
-    100: "./iconos_clima/tormenta_electrica.png"
-}
 
 def redondeo(x):
     y = 100
@@ -42,6 +27,21 @@ def redondeo(x):
     elif x > 90:
         y = 100
     return y
+
+pichincha = gpd.read_file('./Quito/quito_urbano.shp')
+
+marcadores = {
+    10: "./iconos_clima/soleado.png",
+    20: "./iconos_clima/parcialm_nublado.png",
+    30: "./iconos_clima/parcialm_nublado2.png",
+    40: "./iconos_clima/nublado.png",
+    50: "./iconos_clima/nublado.png",
+    60: "./iconos_clima/chubascos.png",
+    70: "./iconos_clima/lluvia.png",
+    80: "./iconos_clima/lluvia.png",
+    90: "./iconos_clima/lluvia_tormenta_electrica.png",
+    100: "./iconos_clima/tormenta_electrica.png"
+}
 
 def mapear_probs(tablacsv):
     with open(tablacsv, 'r') as f:
